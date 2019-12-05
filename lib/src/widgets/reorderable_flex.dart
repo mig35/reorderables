@@ -340,7 +340,7 @@ class _ReorderableFlexContentState extends State<_ReorderableFlexContent>
   }
 
   // Scrolls to a target context if that context is not on the screen.
-  void _scrollTo(BuildContext context) {
+  void _scrollTo(BuildContext context) async {
     if (_scrolling) return;
     final RenderObject contextObject = context.findRenderObject();
     final RenderAbstractViewport viewport = RenderAbstractViewport.of(contextObject);
@@ -364,17 +364,13 @@ class _ReorderableFlexContentState extends State<_ReorderableFlexContent>
     // If the context is off screen, then we request a scroll to make it visible.
     if (!onScreen) {
       _scrolling = true;
-      _scrollController.position
-          .animateTo(
+      await _scrollController.position.animateTo(
         scrollOffset < bottomOffset ? bottomOffset : topOffset,
         duration: _scrollAnimationDuration,
         curve: Curves.easeInOut,
-      )
-          .then((void value) {
-        setState(() {
-          _scrolling = false;
-        });
-      });
+      );
+      await Future.delayed(Duration(milliseconds: 100));
+      _scrolling = false;
     }
   }
 
