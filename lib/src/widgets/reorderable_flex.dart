@@ -696,7 +696,9 @@ class _ReorderableFlexContentState extends State<_ReorderableFlexContent>
 
             _requestAnimationToNextIndex(isAcceptingNewTarget: true);
           });
-          _scrollTo(context);
+          if (null != _dragging) {
+            _scrollTo(context);
+          }
           // If the target is not the original starting point, then we will accept the drop.
           return willAccept; //_dragging == toAccept && toAccept != toWrap.key;
         },
