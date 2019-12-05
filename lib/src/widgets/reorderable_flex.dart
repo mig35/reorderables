@@ -700,7 +700,7 @@ class _ReorderableFlexContentState extends State<_ReorderableFlexContent>
             _scrollTo(context);
           }
           // If the target is not the original starting point, then we will accept the drop.
-          return willAccept; //_dragging == toAccept && toAccept != toWrap.key;
+          return true; //_dragging == toAccept && toAccept != toWrap.key;
         },
         onAccept: (Key accepted) {},
         onLeave: (Key leaving) {
