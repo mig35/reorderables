@@ -703,7 +703,7 @@ class _ReorderableFlexContentState extends State<_ReorderableFlexContent>
           return true; //_dragging == toAccept && toAccept != toWrap.key;
         },
         onAccept: (Key accepted) {},
-        onLeave: (Key leaving) {
+        onLeave: (leaving) {
           if (!_scrolling) {
             _switchDragging = null;
           }
