@@ -22,9 +22,9 @@ import 'reorderable_mixin.dart';
 int _kDefaultSemanticIndexCallback(Widget _, int localIndex) => localIndex;
 
 mixin _ReorderableSliverChildDelegateMixin<T extends SliverChildDelegate> {
-  Widget Function(Widget toWrap, int index) _wrap;
+  late Widget Function(Widget? toWrap, int index) _wrap;
   set wrap(Function value) {
-    _wrap = value;
+    _wrap = value as Widget Function(Widget?, int);
   }
 }
 
@@ -49,7 +49,7 @@ class ReorderableSliverChildBuilderDelegate extends SliverChildBuilderDelegate w
   /// null.
   ReorderableSliverChildBuilderDelegate(
     IndexedWidgetBuilder builder, {
-    int childCount,
+    int? childCount,
     bool addAutomaticKeepAlives = true,
     bool addRepaintBoundaries = true,
     bool addSemanticIndexes = true,
@@ -82,12 +82,11 @@ class ReorderableSliverChildBuilderDelegate extends SliverChildBuilderDelegate w
 //  }
 
   @override
-  Widget build(BuildContext context, int index) {
+  Widget? build(BuildContext context, int index) {
 //    Widget child = super.build(context, index);
-    assert(builder != null);
-    if (index < 0 || (childCount != null && index >= childCount))
+    if (index < 0 || (childCount != null && index >= childCount!))
       return null;
-    Widget child = builder(context, index);
+    Widget? child = builder(context, index);
 //    try {
 //      child = builder(context, index);
 //    } catch (exception, stackTrace) {
@@ -98,7 +97,7 @@ class ReorderableSliverChildBuilderDelegate extends SliverChildBuilderDelegate w
     if (addRepaintBoundaries)
       child = RepaintBoundary.wrap(child, index);
     if (addSemanticIndexes) {
-      final int semanticIndex = semanticIndexCallback(child, index);
+      final int? semanticIndex = semanticIndexCallback(child, index);
       if (semanticIndex != null)
         child = IndexedSemantics(index: semanticIndex + semanticIndexOffset, child: child);
     }
@@ -156,18 +155,16 @@ class ReorderableSliverChildListDelegate extends SliverChildListDelegate with _R
   bool shouldRebuild(covariant ReorderableSliverChildListDelegate oldDelegate) => true;
 
   @override
-  Widget build(BuildContext context, int index) {
+  Widget? build(BuildContext context, int index) {
 //    Widget child = super.build(context, index);
-    assert(children != null);
     if (index < 0 || index >= children.length)
       return null;
     Widget child = children[index];
 //    debugPrint('${DateTime.now().toString().substring(5, 22)} reorderable_sliver.dart(97) $this.build: index:$index child:$child');
-    assert(child != null);
     if (addRepaintBoundaries)
       child = RepaintBoundary.wrap(child, index);
     if (addSemanticIndexes) {
-      final int semanticIndex = semanticIndexCallback(child, index);
+      final int? semanticIndex = semanticIndexCallback(child, index);
       if (semanticIndex != null)
         child = IndexedSemantics(index: semanticIndex + semanticIndexOffset, child: child);
     }
@@ -241,15 +238,14 @@ class ReorderableSliverList extends StatefulWidget {
 
   /// Creates a reorderable list.
   ReorderableSliverList({
-    Key key,
-    @required this.delegate,
-    @required this.onReorder,
+    Key? key,
+    required this.delegate,
+    required this.onReorder,
     this.buildItemsContainer,
     this.buildDraggableFeedback,
     this.onNoReorder,
     this.onReorderStarted,
-  }): assert(onReorder != null && delegate != null),
-      super(key: key);
+  }): super(key: key);
 
   /// The delegate that provides the children for this widget.
   ///
@@ -266,11 +262,11 @@ class ReorderableSliverList extends StatefulWidget {
   /// Called when a child is dropped into a new position to shuffle the
   /// children.
   final ReorderCallback onReorder;
-  final NoReorderCallback onNoReorder;
-  final ReorderStartedCallback onReorderStarted;
+  final NoReorderCallback? onNoReorder;
+  final ReorderStartedCallback? onReorderStarted;
 
-  final BuildItemsContainer buildItemsContainer;
-  final BuildDraggableFeedback buildDraggableFeedback;
+  final BuildItemsContainer? buildItemsContainer;
+  final BuildDraggableFeedback? buildDraggableFeedback;
 
   @override
   _ReorderableSliverListState createState() => _ReorderableSliverListState();
@@ -298,24 +294,24 @@ class _ReorderableSliverListState extends State<ReorderableSliverList>
   static const Duration _scrollAnimationDuration = Duration(milliseconds: 200);
 
   // Controls scrolls and measures scroll progress.
-  ScrollController _scrollController;
-  ScrollPosition _attachedScrollPosition;
+  ScrollController? _scrollController;
+  ScrollPosition? _attachedScrollPosition;
 
   // This controls the entrance of the dragging widget into a new place.
-  AnimationController _entranceController;
+  AnimationController? _entranceController;
 
   // This controls the 'ghost' of the dragging widget, which is left behind
   // where the widget used to be.
-  AnimationController _ghostController;
+  AnimationController? _ghostController;
 
   // The member of widget.children currently being dragged.
   //
   // Null if no drag is underway.
 //  Key _dragging;
-  Widget _draggingWidget;
+  Widget? _draggingWidget;
 
   // The last computed size of the feedback widget being dragged.
-  Size _draggingFeedbackSize;
+  Size? _draggingFeedbackSize;
 
 //  BuildContext _draggingContext;
 
@@ -337,7 +333,7 @@ class _ReorderableSliverListState extends State<ReorderableSliverList>
 
 //  final GlobalKey _contentKey = GlobalKey(debugLabel: '$ReorderableSliverList content key');
 
-  int _childCount;
+  int? _childCount;
 
   final Map<int, StateSetter> _setStateMap = <int, StateSetter>{};
   final List<int> _spacedIndexes = <int>[];
@@ -346,7 +342,7 @@ class _ReorderableSliverListState extends State<ReorderableSliverList>
     if (_draggingFeedbackSize == null) {
       return Size(0, 0);
     }
-    return _draggingFeedbackSize + Offset(_dropAreaMargin, _dropAreaMargin);
+    return _draggingFeedbackSize! + Offset(_dropAreaMargin, _dropAreaMargin);
   }
 
   @override
@@ -354,7 +350,7 @@ class _ReorderableSliverListState extends State<ReorderableSliverList>
     super.initState();
     _entranceController = AnimationController(value: 1.0, vsync: this, duration: _reorderAnimationDuration);
     _ghostController = AnimationController(value: 0, vsync: this, duration: _reorderAnimationDuration);
-    _entranceController.addStatusListener(_onEntranceStatusChanged);
+    _entranceController!.addStatusListener(_onEntranceStatusChanged);
 
 //    if (widget.delegate is ReorderableSliverChildBuilderDelegate) {
 //      _childCount = (widget.delegate as ReorderableSliverChildBuilderDelegate).childCount;
@@ -366,21 +362,21 @@ class _ReorderableSliverListState extends State<ReorderableSliverList>
   @override
   void didChangeDependencies() {
     if (_scrollController != null && _attachedScrollPosition != null) {
-      _scrollController.detach(_attachedScrollPosition);
+      _scrollController!.detach(_attachedScrollPosition!);
       _attachedScrollPosition = null;
     }
 
     _scrollController = PrimaryScrollController.of(context) ?? ScrollController();
 
-    if (_scrollController.positions.isEmpty) {
-      ScrollableState scrollableState = Scrollable.of(context);
+    if (_scrollController!.positions.isEmpty) {
+      ScrollableState? scrollableState = Scrollable.of(context);
       _attachedScrollPosition = scrollableState?.position;
     } else {
       _attachedScrollPosition = null;
     }
 
     if (_attachedScrollPosition != null) {
-      _scrollController.attach(_attachedScrollPosition);
+      _scrollController!.attach(_attachedScrollPosition!);
     }
 
     super.didChangeDependencies();
@@ -389,11 +385,11 @@ class _ReorderableSliverListState extends State<ReorderableSliverList>
   @override
   void dispose() {
     if (_scrollController != null && _attachedScrollPosition != null) {
-      _scrollController.detach(_attachedScrollPosition);
+      _scrollController!.detach(_attachedScrollPosition!);
       _attachedScrollPosition = null;
     }
-    _entranceController.dispose();
-    _ghostController.dispose();
+    _entranceController!.dispose();
+    _ghostController!.dispose();
     super.dispose();
   }
 
@@ -412,11 +408,11 @@ class _ReorderableSliverListState extends State<ReorderableSliverList>
   }
 
   // Animates the droppable space from _currentIndex to _nextIndex.
-  void _requestAnimationToNextIndex({bool isAcceptingNewTarget=false, int updatingIndex}) {
+  void _requestAnimationToNextIndex({bool isAcceptingNewTarget=false, int? updatingIndex}) {
 //    debugPrint('${DateTime.now().toString().substring(5, 22)} reorderable_sliver.dart(345) $this._requestAnimationToNextIndex: '
 //      '_dragStartIndex:$_dragStartIndex _ghostIndex:$_ghostIndex _currentIndex:$_currentIndex _nextIndex:$_nextIndex isAcceptingNewTarget:$isAcceptingNewTarget isCompleted:${_entranceController.isCompleted}');
 
-    if (_entranceController.isCompleted) {
+    if (_entranceController!.isCompleted) {
       void _update() {
         _ghostIndex = _currentIndex;
         if (!isAcceptingNewTarget && _nextIndex == _currentIndex) { // && _dragStartIndex == _ghostIndex
@@ -424,8 +420,8 @@ class _ReorderableSliverListState extends State<ReorderableSliverList>
         }
 
         _currentIndex = _nextIndex;
-        _ghostController.reverse(from: 1.0);
-        _entranceController.forward(from: 0.0);
+        _ghostController!.reverse(from: 1.0);
+        _entranceController!.forward(from: 0.0);
       }
 
       Set<int> updateIndexSet = Set<int>();
@@ -460,7 +456,7 @@ class _ReorderableSliverListState extends State<ReorderableSliverList>
           if (_setStateMap[index] == null) {
 //            debugPrint('${DateTime.now().toString().substring(5, 22)} reorderable_sliver.dart(394) $this._setState: index:$index _setStateMap:$_setStateMap');
           }
-          _setStateMap[index](_setState);
+          _setStateMap[index]!(_setState);
         } else {
           _update();
         }
@@ -483,9 +479,8 @@ class _ReorderableSliverListState extends State<ReorderableSliverList>
   void _scrollTo(BuildContext context) {
     if (_scrolling)
       return;
-    final RenderObject contextObject = context.findRenderObject();
-    final RenderAbstractViewport viewport = RenderAbstractViewport.of(contextObject);
-    assert(viewport != null);
+    final RenderObject contextObject = context.findRenderObject()!;
+    final RenderAbstractViewport viewport = RenderAbstractViewport.of(contextObject)!;
 
 //    if (_scrollController.positions.isEmpty) {
 //      debugPrint('${DateTime.now().toString().substring(5, 22)} reorderable_sliver.dart(537) $this._scrollTo: empty pos');
@@ -500,16 +495,16 @@ class _ReorderableSliverListState extends State<ReorderableSliverList>
 //    final double margin = widget.direction == Axis.horizontal ? _dropAreaSize.width : _dropAreaSize.height;
     final double margin = _dropAreaSize.height / 2;
 
-    assert(_scrollController.positions.isNotEmpty, 'An attached scroll controller is needed. '
+    assert(_scrollController!.positions.isNotEmpty, 'An attached scroll controller is needed. '
       'You probably forgot to attach one to the parent scroll view that contains this reorderable list.');
 
-    final double scrollOffset = _scrollController.offset;
+    final double scrollOffset = _scrollController!.offset;
     final double topOffset = max(
-      _scrollController.position.minScrollExtent,
+      _scrollController!.position.minScrollExtent,
       viewport.getOffsetToReveal(contextObject, 0.0).offset - margin,
     );
     final double bottomOffset = min(
-      _scrollController.position.maxScrollExtent,
+      _scrollController!.position.maxScrollExtent,
       viewport.getOffsetToReveal(contextObject, 1.0).offset + margin,
     );
     final bool onScreen = scrollOffset <= topOffset && scrollOffset >= bottomOffset;
@@ -517,7 +512,7 @@ class _ReorderableSliverListState extends State<ReorderableSliverList>
     // If the context is off screen, then we request a scroll to make it visible.
     if (!onScreen) {
       _scrolling = true;
-      _scrollController.position.animateTo(
+      _scrollController!.position.animateTo(
         scrollOffset < bottomOffset ? bottomOffset : topOffset,
 //        _scrollController.position.maxScrollExtent,
         duration: _scrollAnimationDuration,
@@ -532,7 +527,7 @@ class _ReorderableSliverListState extends State<ReorderableSliverList>
 
   // Wraps children in Row or Column, so that the children flow in
   // the widget's scrollDirection.
-  Widget _buildContainerForMainAxis({List<Widget> children}) {
+  Widget _buildContainerForMainAxis({required List<Widget> children}) {
     var column = Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -558,7 +553,7 @@ class _ReorderableSliverListState extends State<ReorderableSliverList>
   Widget _statefulWrap(Widget toWrap, int index, StateSetter setState) {
 //    assert(toWrap.key != null);
 //    final GlobalObjectKey keyIndexGlobalKey = GlobalObjectKey(toWrap.key);
-    BuildContext draggableContext;
+    late BuildContext draggableContext;
     // We pass the toWrapWithGlobalKey into the Draggable so that when a list
     // item gets dragged, the accessibility framework can preserve the selected
     // state of the dragging item.
@@ -572,12 +567,12 @@ class _ReorderableSliverListState extends State<ReorderableSliverList>
         _dragStartIndex = index;
         _ghostIndex = index;
         _currentIndex = index;
-        _entranceController.value = 1.0;
+        _entranceController!.value = 1.0;
         _draggingFeedbackSize = draggableContext.size;//keyIndexGlobalKey.currentContext.size;
 //        _draggingContext = draggableContext;
 
         if (widget.onReorderStarted != null) {
-          widget.onReorderStarted(index);
+          widget.onReorderStarted!(index);
         }
       });
     }
@@ -588,12 +583,12 @@ class _ReorderableSliverListState extends State<ReorderableSliverList>
       if (startIndex != endIndex)
         widget.onReorder(startIndex, endIndex);
       else if (widget.onNoReorder != null)
-        widget.onNoReorder(startIndex);
+        widget.onNoReorder!(startIndex);
       // Animates leftover space in the drop area closed.
       // TODO(djshuckerow): bring the animation in line with the Material
       // specifications.
-      _ghostController.reverse(from: 0.1);
-      _entranceController.reverse(from: 0);
+      _ghostController!.reverse(from: 0.1);
+      _entranceController!.reverse(from: 0);
 
 //      _dragging = null;
       _dragStartIndex = -1;
@@ -627,7 +622,7 @@ class _ReorderableSliverListState extends State<ReorderableSliverList>
         void _setState() {
           if (updateIndexes.length > 0) {
             int index = updateIndexes.removeLast();
-            _setStateMap[index](_setState);
+            _setStateMap[index]!(_setState);
           } else {
             _update();
           }
@@ -644,7 +639,7 @@ class _ReorderableSliverListState extends State<ReorderableSliverList>
 
       // Create the appropriate semantics actions.
       void moveToStart() => reorder(index, 0);
-      void moveToEnd() => reorder(index, _childCount - 1);
+      void moveToEnd() => reorder(index, _childCount! - 1);
       void moveBefore() => reorder(index, index - 1);
       // To move after, we go to index+2 because we are moving it to the space
       // before index+2, which is after the space at index+1.
@@ -652,30 +647,27 @@ class _ReorderableSliverListState extends State<ReorderableSliverList>
 
       final MaterialLocalizations localizations = MaterialLocalizations.of(context);
 
-      if (localizations != null) {
-        // If the item can move to before its current position in the list.
-        if (index > 0) {
-          semanticsActions[CustomSemanticsAction(label: localizations.reorderItemToStart)] = moveToStart;
-          String reorderItemBefore = localizations.reorderItemUp;
+      if (index > 0) {
+        semanticsActions[CustomSemanticsAction(label: localizations.reorderItemToStart)] = moveToStart;
+        String reorderItemBefore = localizations.reorderItemUp;
 //        if (widget.direction == Axis.horizontal) {
 //          reorderItemBefore = Directionality.of(context) == TextDirection.ltr
 //            ? localizations.reorderItemLeft
 //            : localizations.reorderItemRight;
 //        }
-          semanticsActions[CustomSemanticsAction(label: reorderItemBefore)] = moveBefore;
-        }
+        semanticsActions[CustomSemanticsAction(label: reorderItemBefore)] = moveBefore;
+      }
 
-        // If the item can move to after its current position in the list.
-        if (index < _childCount - 1) {
-          String reorderItemAfter = localizations.reorderItemDown;
+      // If the item can move to after its current position in the list.
+      if (index < _childCount! - 1) {
+        String reorderItemAfter = localizations.reorderItemDown;
 //        if (widget.direction == Axis.horizontal) {
 //          reorderItemAfter = Directionality.of(context) == TextDirection.ltr
 //            ? localizations.reorderItemRight
 //            : localizations.reorderItemLeft;
 //        }
-          semanticsActions[CustomSemanticsAction(label: reorderItemAfter)] = moveAfter;
-          semanticsActions[CustomSemanticsAction(label: localizations.reorderItemToEnd)] = moveToEnd;
-        }
+        semanticsActions[CustomSemanticsAction(label: reorderItemAfter)] = moveAfter;
+        semanticsActions[CustomSemanticsAction(label: localizations.reorderItemToEnd)] = moveToEnd;
       }
 
       // We pass toWrap with a GlobalKey into the Draggable so that when a list
@@ -708,14 +700,14 @@ class _ReorderableSliverListState extends State<ReorderableSliverList>
       return makeDisappearingWidget(child, _ghostController, _draggingFeedbackSize, Axis.vertical,);
     }
 
-    Widget buildDragTarget(BuildContext context, List<int> acceptedCandidates, List<dynamic> rejectedCandidates) {
+    Widget buildDragTarget(BuildContext context, List<int?> acceptedCandidates, List<dynamic> rejectedCandidates) {
       final Widget toWrapWithSemantics = wrapWithSemantics();
 
       Widget feedbackBuilder = Builder(
         builder: (BuildContext context) {
 //          RenderRepaintBoundary renderObject = _contentKey.currentContext.findRenderObject();
 //          BoxConstraints contentSizeConstraints = BoxConstraints.loose(renderObject.size);
-          BoxConstraints contentSizeConstraints = BoxConstraints.loose(_draggingFeedbackSize);//renderObject.constraints
+          BoxConstraints contentSizeConstraints = BoxConstraints.loose(_draggingFeedbackSize!);//renderObject.constraints
 //          debugPrint('${DateTime.now().toString().substring(5, 22)} reorderable_flex.dart(515) $this.buildDragTarget: contentConstraints:$contentSizeConstraints _draggingFeedbackSize:$_draggingFeedbackSize');
           return (widget.buildDraggableFeedback ?? defaultBuildDraggableFeedback)(context, contentSizeConstraints, toWrap);
         }
@@ -774,7 +766,7 @@ class _ReorderableSliverListState extends State<ReorderableSliverList>
 
       // The target for dropping at the end of the list doesn't need to be
       // draggable.
-      if (index >= _childCount) {
+      if (index >= _childCount!) {
         child = toWrap;
       }
 
@@ -797,7 +789,7 @@ class _ReorderableSliverListState extends State<ReorderableSliverList>
     return Builder(builder: (BuildContext context) {
       Widget dragTarget = DragTarget<int>(
         builder: buildDragTarget,
-        onWillAccept: (int toAccept) {
+        onWillAccept: (int? toAccept) {
           bool willAccept = _dragStartIndex == toAccept && toAccept != index;
 //          debugPrint('${DateTime.now().toString().substring(5, 22)} reorderable_sliver.dart(679) $this._statefulWrap: '
 //            'onWillAccept: toAccept:$toAccept return:$willAccept _nextIndex:$_nextIndex index:$index _currentIndex:$_currentIndex _dragStartIndex:$_dragStartIndex');

@@ -37,12 +37,12 @@ import './typedefs.dart';
 class ReorderableFlex extends StatefulWidget {
   /// Creates a reorderable list.
   ReorderableFlex({
-    Key key,
+    Key? key,
     this.header,
     this.footer,
-    @required this.children,
-    @required this.onReorder,
-    @required this.direction,
+    required this.children,
+    required this.onReorder,
+    required this.direction,
     this.scrollDirection = Axis.vertical,
     this.padding,
     this.buildItemsContainer,
@@ -52,10 +52,7 @@ class ReorderableFlex extends StatefulWidget {
     this.onReorderStarted,
     this.scrollController,
     this.needsLongPressDraggable = true,
-  })  : assert(direction != null),
-        assert(onReorder != null),
-        assert(children != null),
-        assert(
+  })  : assert(
           children.every((Widget w) => w.key != null),
           'All children of this widget must have a key.',
         ),
@@ -64,12 +61,12 @@ class ReorderableFlex extends StatefulWidget {
   /// A non-reorderable header widget to show before the list.
   ///
   /// If null, no header will appear at the top/left of the widget.
-  final Widget header;
+  final Widget? header;
 
   /// A non-reorderable footer widget to show after the list.
   ///
   /// If null, no footer will appear at the bottom/right of the widget.
-  final Widget footer;
+  final Widget? footer;
 
   /// The widgets to display.
   final List<Widget> children;
@@ -79,19 +76,19 @@ class ReorderableFlex extends StatefulWidget {
   /// List [children] can only drag along this [Axis].
   final Axis direction;
   final Axis scrollDirection;
-  final ScrollController scrollController;
+  final ScrollController? scrollController;
 
   /// The amount of space by which to inset the [children].
-  final EdgeInsets padding;
+  final EdgeInsets? padding;
 
   /// Called when a child is dropped into a new position to shuffle the
   /// children.
   final ReorderCallback onReorder;
-  final NoReorderCallback onNoReorder;
-  final ReorderStartedCallback onReorderStarted;
+  final NoReorderCallback? onNoReorder;
+  final ReorderStartedCallback? onReorderStarted;
 
-  final BuildItemsContainer buildItemsContainer;
-  final BuildDraggableFeedback buildDraggableFeedback;
+  final BuildItemsContainer? buildItemsContainer;
+  final BuildDraggableFeedback? buildDraggableFeedback;
 
   final MainAxisAlignment mainAxisAlignment;
 
@@ -115,7 +112,7 @@ class _ReorderableFlexState extends State<ReorderableFlex> {
   final GlobalKey _overlayKey = GlobalKey(debugLabel: '$ReorderableFlex overlay key');
 
   // This entry contains the scrolling list itself.
-  PassthroughOverlayEntry _listOverlayEntry;
+  PassthroughOverlayEntry? _listOverlayEntry;
 
   @override
   void initState() {
@@ -145,7 +142,7 @@ class _ReorderableFlexState extends State<ReorderableFlex> {
 
   @override
   Widget build(BuildContext context) {
-    return PassthroughOverlay(key: _overlayKey, initialEntries: <PassthroughOverlayEntry>[
+    return PassthroughOverlay(key: _overlayKey, initialEntries: <PassthroughOverlayEntry?>[
       _listOverlayEntry,
     ]);
   }
@@ -157,32 +154,32 @@ class _ReorderableFlexContent extends StatefulWidget {
   const _ReorderableFlexContent({
     this.header,
     this.footer,
-    @required this.children,
-    @required this.direction,
-    @required this.scrollDirection,
-    @required this.padding,
-    @required this.onReorder,
-    @required this.onNoReorder,
-    @required this.onReorderStarted,
-    @required this.buildItemsContainer,
-    @required this.buildDraggableFeedback,
-    @required this.mainAxisAlignment,
-    @required this.scrollController,
-    @required this.needsLongPressDraggable,
+    required this.children,
+    required this.direction,
+    required this.scrollDirection,
+    required this.padding,
+    required this.onReorder,
+    required this.onNoReorder,
+    required this.onReorderStarted,
+    required this.buildItemsContainer,
+    required this.buildDraggableFeedback,
+    required this.mainAxisAlignment,
+    required this.scrollController,
+    required this.needsLongPressDraggable,
   });
 
-  final Widget header;
-  final Widget footer;
+  final Widget? header;
+  final Widget? footer;
   final List<Widget> children;
   final Axis direction;
   final Axis scrollDirection;
-  final ScrollController scrollController;
-  final EdgeInsets padding;
+  final ScrollController? scrollController;
+  final EdgeInsets? padding;
   final ReorderCallback onReorder;
-  final NoReorderCallback onNoReorder;
-  final ReorderStartedCallback onReorderStarted;
-  final BuildItemsContainer buildItemsContainer;
-  final BuildDraggableFeedback buildDraggableFeedback;
+  final NoReorderCallback? onNoReorder;
+  final ReorderStartedCallback? onReorderStarted;
+  final BuildItemsContainer? buildItemsContainer;
+  final BuildDraggableFeedback? buildDraggableFeedback;
 
   final MainAxisAlignment mainAxisAlignment;
   final bool needsLongPressDraggable;
@@ -211,25 +208,25 @@ class _ReorderableFlexContentState extends State<_ReorderableFlexContent>
   static const Duration _scrollAnimationDuration = Duration(milliseconds: 200);
 
   // Controls scrolls and measures scroll progress.
-  ScrollController _scrollController;
-  ScrollPosition _attachedScrollPosition;
+  ScrollController? _scrollController;
+  ScrollPosition? _attachedScrollPosition;
 
   // This controls the entrance of the dragging widget into a new place.
-  AnimationController _entranceController;
+  AnimationController? _entranceController;
 
   // This controls the 'ghost' of the dragging widget, which is left behind
   // where the widget used to be.
-  AnimationController _ghostController;
+  AnimationController? _ghostController;
 
   // The member of widget.children currently being dragged.
   //
   // Null if no drag is underway.
-  Key _dragging;
-  Widget _draggingWidget;
-  Key _switchDragging;
+  Key? _dragging;
+  Widget? _draggingWidget;
+  Key? _switchDragging;
 
   // The last computed size of the feedback widget being dragged.
-  Size _draggingFeedbackSize;
+  Size? _draggingFeedbackSize;
 
   // The location that the dragging widget occupied before it started to drag.
   int _dragStartIndex = -1;
@@ -253,7 +250,7 @@ class _ReorderableFlexContentState extends State<_ReorderableFlexContent>
     if (_draggingFeedbackSize == null) {
       return Size(0, 0);
     }
-    return _draggingFeedbackSize + Offset(_dropAreaMargin, _dropAreaMargin);
+    return _draggingFeedbackSize! + Offset(_dropAreaMargin, _dropAreaMargin);
 //    double dropAreaWithoutMargin;
 //    switch (widget.direction) {
 //      case Axis.horizontal:
@@ -274,28 +271,28 @@ class _ReorderableFlexContentState extends State<_ReorderableFlexContent>
         AnimationController(value: 1.0, vsync: this, duration: _reorderAnimationDuration);
     _ghostController =
         AnimationController(value: 0, vsync: this, duration: _reorderAnimationDuration);
-    _entranceController.addStatusListener(_onEntranceStatusChanged);
+    _entranceController!.addStatusListener(_onEntranceStatusChanged);
   }
 
   @override
   void didChangeDependencies() {
     if (_scrollController != null && _attachedScrollPosition != null) {
-      _scrollController.detach(_attachedScrollPosition);
+      _scrollController!.detach(_attachedScrollPosition!);
       _attachedScrollPosition = null;
     }
 
     _scrollController =
         widget.scrollController ?? PrimaryScrollController.of(context) ?? ScrollController();
 
-    if (_scrollController.positions.isEmpty) {
-      ScrollableState scrollableState = Scrollable.of(context);
+    if (_scrollController!.positions.isEmpty) {
+      ScrollableState? scrollableState = Scrollable.of(context);
       _attachedScrollPosition = scrollableState?.position;
     } else {
       _attachedScrollPosition = null;
     }
 
     if (_attachedScrollPosition != null) {
-      _scrollController.attach(_attachedScrollPosition);
+      _scrollController!.attach(_attachedScrollPosition!);
     }
 
     super.didChangeDependencies();
@@ -304,11 +301,11 @@ class _ReorderableFlexContentState extends State<_ReorderableFlexContent>
   @override
   void dispose() {
     if (_scrollController != null && _attachedScrollPosition != null) {
-      _scrollController.detach(_attachedScrollPosition);
+      _scrollController!.detach(_attachedScrollPosition!);
       _attachedScrollPosition = null;
     }
-    _entranceController.dispose();
-    _ghostController.dispose();
+    _entranceController!.dispose();
+    _ghostController!.dispose();
     super.dispose();
   }
 
@@ -317,7 +314,7 @@ class _ReorderableFlexContentState extends State<_ReorderableFlexContent>
 //    debugPrint('${DateTime.now().toString().substring(5, 22)} reorderable_flex.dart(285) $this._requestAnimationToNextIndex: '
 //      '_dragStartIndex:$_dragStartIndex _ghostIndex:$_ghostIndex _currentIndex:$_currentIndex _nextIndex:$_nextIndex isAcceptingNewTarget:$isAcceptingNewTarget isCompleted:${_entranceController.isCompleted}');
 
-    if (_entranceController.isCompleted) {
+    if (_entranceController!.isCompleted) {
       _ghostIndex = _currentIndex;
       if (!isAcceptingNewTarget && _nextIndex == _currentIndex) {
         // && _dragStartIndex == _ghostIndex
@@ -325,8 +322,8 @@ class _ReorderableFlexContentState extends State<_ReorderableFlexContent>
       }
 
       _currentIndex = _nextIndex;
-      _ghostController.reverse(from: 1.0);
-      _entranceController.forward(from: 0.0);
+      _ghostController!.reverse(from: 1.0);
+      _entranceController!.forward(from: 0.0);
     }
   }
 
@@ -342,21 +339,20 @@ class _ReorderableFlexContentState extends State<_ReorderableFlexContent>
   // Scrolls to a target context if that context is not on the screen.
   void _scrollTo(BuildContext context) async {
     if (_scrolling) return;
-    final RenderObject contextObject = context.findRenderObject();
-    final RenderAbstractViewport viewport = RenderAbstractViewport.of(contextObject);
-    assert(viewport != null);
+    final RenderObject contextObject = context.findRenderObject()!;
+    final RenderAbstractViewport viewport = RenderAbstractViewport.of(contextObject)!;
     // If and only if the current scroll offset falls in-between the offsets
     // necessary to reveal the selected context at the top or bottom of the
     // screen, then it is already on-screen.
     final double margin =
         widget.direction == Axis.horizontal ? _dropAreaSize.width : _dropAreaSize.height;
-    final double scrollOffset = _scrollController.offset;
+    final double scrollOffset = _scrollController!.offset;
     final double topOffset = max(
-      _scrollController.position.minScrollExtent,
+      _scrollController!.position.minScrollExtent,
       viewport.getOffsetToReveal(contextObject, 0.0).offset - margin,
     );
     final double bottomOffset = min(
-      _scrollController.position.maxScrollExtent,
+      _scrollController!.position.maxScrollExtent,
       viewport.getOffsetToReveal(contextObject, 1.0).offset + margin,
     );
     final bool onScreen = scrollOffset <= topOffset && scrollOffset >= bottomOffset;
@@ -364,7 +360,7 @@ class _ReorderableFlexContentState extends State<_ReorderableFlexContent>
     // If the context is off screen, then we request a scroll to make it visible.
     if (!onScreen) {
       _scrolling = true;
-      await _scrollController.position.animateTo(
+      await _scrollController!.position.animateTo(
         scrollOffset < bottomOffset ? bottomOffset : topOffset,
         duration: _scrollAnimationDuration,
         curve: Curves.easeInOut,
@@ -376,18 +372,18 @@ class _ReorderableFlexContentState extends State<_ReorderableFlexContent>
 
   // Wraps children in Row or Column, so that the children flow in
   // the widget's scrollDirection.
-  Widget _buildContainerForMainAxis({List<Widget> children}) {
+  Widget _buildContainerForMainAxis({List<Widget>? children}) {
     switch (widget.direction) {
       case Axis.horizontal:
         return Row(
             mainAxisSize: MainAxisSize.min,
-            children: children,
+            children: children!,
             mainAxisAlignment: widget.mainAxisAlignment);
       case Axis.vertical:
       default:
         return Column(
             mainAxisSize: MainAxisSize.min,
-            children: children,
+            children: children!,
             mainAxisAlignment: widget.mainAxisAlignment);
     }
   }
@@ -396,7 +392,7 @@ class _ReorderableFlexContentState extends State<_ReorderableFlexContent>
   // Handles up the logic for dragging and reordering items in the list.
   Widget _wrap(Widget toWrap, int index) {
     assert(toWrap.key != null);
-    final GlobalObjectKey keyIndexGlobalKey = GlobalObjectKey(toWrap.key);
+    final GlobalObjectKey keyIndexGlobalKey = GlobalObjectKey(toWrap.key!);
     // We pass the toWrapWithGlobalKey into the Draggable so that when a list
     // item gets dragged, the accessibility framework can preserve the selected
     // state of the dragging item.
@@ -409,12 +405,12 @@ class _ReorderableFlexContentState extends State<_ReorderableFlexContent>
         _dragStartIndex = index;
         _ghostIndex = index;
         _currentIndex = index;
-        _entranceController.value = 1.0;
-        _draggingFeedbackSize = keyIndexGlobalKey.currentContext.size;
+        _entranceController!.value = 1.0;
+        _draggingFeedbackSize = keyIndexGlobalKey.currentContext!.size;
         _switchDragging = null;
 
         if (widget.onReorderStarted != null) {
-          widget.onReorderStarted(index);
+          widget.onReorderStarted!(index);
         }
       });
     }
@@ -424,12 +420,12 @@ class _ReorderableFlexContentState extends State<_ReorderableFlexContent>
 //      debugPrint('startIndex:$startIndex endIndex:$endIndex');
       if (startIndex != endIndex)
         widget.onReorder(startIndex, endIndex);
-      else if (widget.onNoReorder != null) widget.onNoReorder(startIndex);
+      else if (widget.onNoReorder != null) widget.onNoReorder!(startIndex);
       // Animates leftover space in the drop area closed.
       // TODO(djshuckerow): bring the animation in line with the Material
       // specifications.
-      _ghostController.reverse(from: 0.1);
-      _entranceController.reverse(from: 0);
+      _ghostController!.reverse(from: 0.1);
+      _entranceController!.reverse(from: 0);
 
       _dragging = null;
       _switchDragging = null;
@@ -469,32 +465,29 @@ class _ReorderableFlexContentState extends State<_ReorderableFlexContent>
 
       final MaterialLocalizations localizations = MaterialLocalizations.of(context);
 
-      if (localizations != null) {
-        // If the item can move to before its current position in the list.
-        if (index > 0) {
-          semanticsActions[CustomSemanticsAction(label: localizations.reorderItemToStart)] =
-              moveToStart;
-          String reorderItemBefore = localizations.reorderItemUp;
-          if (widget.direction == Axis.horizontal) {
-            reorderItemBefore = Directionality.of(context) == TextDirection.ltr
-                ? localizations.reorderItemLeft
-                : localizations.reorderItemRight;
-          }
-          semanticsActions[CustomSemanticsAction(label: reorderItemBefore)] = moveBefore;
+      if (index > 0) {
+        semanticsActions[CustomSemanticsAction(label: localizations.reorderItemToStart)] =
+            moveToStart;
+        String reorderItemBefore = localizations.reorderItemUp;
+        if (widget.direction == Axis.horizontal) {
+          reorderItemBefore = Directionality.of(context) == TextDirection.ltr
+              ? localizations.reorderItemLeft
+              : localizations.reorderItemRight;
         }
+        semanticsActions[CustomSemanticsAction(label: reorderItemBefore)] = moveBefore;
+      }
 
-        // If the item can move to after its current position in the list.
-        if (index < widget.children.length - 1) {
-          String reorderItemAfter = localizations.reorderItemDown;
-          if (widget.direction == Axis.horizontal) {
-            reorderItemAfter = Directionality.of(context) == TextDirection.ltr
-                ? localizations.reorderItemRight
-                : localizations.reorderItemLeft;
-          }
-          semanticsActions[CustomSemanticsAction(label: reorderItemAfter)] = moveAfter;
-          semanticsActions[CustomSemanticsAction(label: localizations.reorderItemToEnd)] =
-              moveToEnd;
+      // If the item can move to after its current position in the list.
+      if (index < widget.children.length - 1) {
+        String reorderItemAfter = localizations.reorderItemDown;
+        if (widget.direction == Axis.horizontal) {
+          reorderItemAfter = Directionality.of(context) == TextDirection.ltr
+              ? localizations.reorderItemRight
+              : localizations.reorderItemLeft;
         }
+        semanticsActions[CustomSemanticsAction(label: reorderItemAfter)] = moveAfter;
+        semanticsActions[CustomSemanticsAction(label: localizations.reorderItemToEnd)] =
+            moveToEnd;
       }
 
       // We pass toWrap with a GlobalKey into the Draggable so that when a list
@@ -539,14 +532,14 @@ class _ReorderableFlexContentState extends State<_ReorderableFlexContent>
     }
 
     Widget buildDragTarget(
-        BuildContext context, List<Key> acceptedCandidates, List<dynamic> rejectedCandidates) {
+        BuildContext context, List<Key?> acceptedCandidates, List<dynamic> rejectedCandidates) {
       final Widget toWrapWithSemantics = wrapWithSemantics();
 
       Widget feedbackBuilder = Builder(builder: (BuildContext context) {
 //          RenderRepaintBoundary renderObject = _contentKey.currentContext.findRenderObject();
 //          BoxConstraints contentSizeConstraints = BoxConstraints.loose(renderObject.size);
         BoxConstraints contentSizeConstraints =
-            BoxConstraints.loose(_draggingFeedbackSize); //renderObject.constraints
+            BoxConstraints.loose(_draggingFeedbackSize!); //renderObject.constraints
 //          debugPrint('${DateTime.now().toString().substring(5, 22)} reorderable_flex.dart(515) $this.buildDragTarget: contentConstraints:$contentSizeConstraints _draggingFeedbackSize:$_draggingFeedbackSize');
         return (widget.buildDraggableFeedback ?? defaultBuildDraggableFeedback)(
             context, contentSizeConstraints, toWrap);
@@ -667,7 +660,7 @@ class _ReorderableFlexContentState extends State<_ReorderableFlexContent>
     return Builder(builder: (BuildContext context) {
       Widget dragTarget = DragTarget<Key>(
         builder: buildDragTarget,
-        onWillAccept: (Key toAccept) {
+        onWillAccept: (Key? toAccept) {
           if (_scrolling) return true;
 
           bool willAccept = _dragging == toAccept && toAccept != toWrap.key;
@@ -791,13 +784,13 @@ class _ReorderableFlexContentState extends State<_ReorderableFlexContent>
 //    return LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
     final List<Widget> wrappedChildren = <Widget>[];
     if (widget.header != null) {
-      wrappedChildren.add(widget.header);
+      wrappedChildren.add(widget.header!);
     }
     for (int i = 0; i < widget.children.length; i += 1) {
       wrappedChildren.add(_wrap(widget.children[i], i));
     }
     if (widget.footer != null) {
-      wrappedChildren.add(widget.footer);
+      wrappedChildren.add(widget.footer!);
     }
 //      const Key endWidgetKey = Key('DraggableList - End Widget');
 //      Widget finalDropArea;
@@ -865,13 +858,13 @@ class _ReorderableFlexContentState extends State<_ReorderableFlexContent>
 ////      headerRow.
 ////    }
 //  }
-  Widget defaultBuildItemsContainer(BuildContext context, Axis direction, List<Widget> children) {
+  Widget defaultBuildItemsContainer(BuildContext context, Axis direction, List<Widget?> children) {
     switch (direction) {
       case Axis.horizontal:
-        return Row(children: children);
+        return Row(children: children as List<Widget>);
       case Axis.vertical:
       default:
-        return Column(children: children);
+        return Column(children: children as List<Widget>);
     }
   }
 
@@ -917,22 +910,22 @@ class _ReorderableFlexContentState extends State<_ReorderableFlexContent>
 ///  * [ReorderableColumn], for a version of this widget that is always vertical.
 class ReorderableRow extends ReorderableFlex {
   ReorderableRow({
-    Key key,
-    Widget header,
-    Widget footer,
-    ReorderCallback onReorder,
-    EdgeInsets padding,
+    Key? key,
+    Widget? header,
+    Widget? footer,
+    required ReorderCallback onReorder,
+    EdgeInsets? padding,
     MainAxisAlignment mainAxisAlignment = MainAxisAlignment.start,
     MainAxisSize mainAxisSize = MainAxisSize.max,
     CrossAxisAlignment crossAxisAlignment = CrossAxisAlignment.center,
-    TextDirection textDirection,
+    TextDirection? textDirection,
     VerticalDirection verticalDirection = VerticalDirection.down,
-    TextBaseline textBaseline,
+    TextBaseline? textBaseline,
     List<Widget> children = const <Widget>[],
-    BuildDraggableFeedback buildDraggableFeedback,
-    NoReorderCallback onNoReorder,
-    ReorderStartedCallback onReorderStarted,
-    ScrollController scrollController,
+    BuildDraggableFeedback? buildDraggableFeedback,
+    NoReorderCallback? onNoReorder,
+    ReorderStartedCallback? onReorderStarted,
+    ScrollController? scrollController,
     bool needsLongPressDraggable = true,
   }) : super(
           key: key,
@@ -990,22 +983,22 @@ class ReorderableRow extends ReorderableFlex {
 ///  * [ReorderableRow], for a version of this widget that is always horizontal.
 class ReorderableColumn extends ReorderableFlex {
   ReorderableColumn({
-    Key key,
-    Widget header,
-    Widget footer,
-    ReorderCallback onReorder,
-    EdgeInsets padding,
+    Key? key,
+    Widget? header,
+    Widget? footer,
+    required ReorderCallback onReorder,
+    EdgeInsets? padding,
     MainAxisAlignment mainAxisAlignment = MainAxisAlignment.start,
     MainAxisSize mainAxisSize = MainAxisSize.max,
     CrossAxisAlignment crossAxisAlignment = CrossAxisAlignment.center,
-    TextDirection textDirection,
+    TextDirection? textDirection,
     VerticalDirection verticalDirection = VerticalDirection.down,
-    TextBaseline textBaseline,
+    TextBaseline? textBaseline,
     List<Widget> children = const <Widget>[],
-    BuildDraggableFeedback buildDraggableFeedback,
-    NoReorderCallback onNoReorder,
-    ReorderStartedCallback onReorderStarted,
-    ScrollController scrollController,
+    BuildDraggableFeedback? buildDraggableFeedback,
+    NoReorderCallback? onNoReorder,
+    ReorderStartedCallback? onReorderStarted,
+    ScrollController? scrollController,
     bool needsLongPressDraggable = true,
   }) : super(
           key: key,

@@ -6,13 +6,13 @@ mixin ReorderableMixin {
   @protected
   Widget makeAppearingWidget(
     Widget child,
-    AnimationController entranceController,
-    Size draggingFeedbackSize,
+    AnimationController? entranceController,
+    Size? draggingFeedbackSize,
     Axis direction,
   ) {
     if (null == draggingFeedbackSize) {
       return SizeTransitionWithIntrinsicSize(
-        sizeFactor: entranceController,
+        sizeFactor: entranceController!,
         axis: direction,
         child: FadeTransition(
           opacity: entranceController,
@@ -21,7 +21,7 @@ mixin ReorderableMixin {
       );
     } else {
       var transition = SizeTransition(
-        sizeFactor: entranceController,
+        sizeFactor: entranceController!,
         axis: direction,
         child: FadeTransition(opacity: entranceController, child: child),
       );
@@ -33,14 +33,14 @@ mixin ReorderableMixin {
 
   @protected
   Widget makeDisappearingWidget(
-      Widget child,
-      AnimationController ghostController,
-      Size draggingFeedbackSize,
+      Widget? child,
+      AnimationController? ghostController,
+      Size? draggingFeedbackSize,
       Axis direction,
       ) {
     if (null == draggingFeedbackSize) {
       return SizeTransitionWithIntrinsicSize(
-        sizeFactor: ghostController,
+        sizeFactor: ghostController!,
         axis: direction,
         child: FadeTransition(
           opacity: ghostController,
@@ -49,7 +49,7 @@ mixin ReorderableMixin {
       );
     } else {
       var transition = SizeTransition(
-        sizeFactor: ghostController,
+        sizeFactor: ghostController!,
         axis: direction,
         child: FadeTransition(opacity: ghostController, child: child),
       );
