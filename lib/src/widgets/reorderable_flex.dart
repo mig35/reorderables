@@ -581,7 +581,7 @@ class _ReorderableFlexContentState extends State<_ReorderableFlexContent>
                   ignoring: true,
                   child: Opacity(opacity: 0, child: Container(width: 0, height: 0, child: toWrap))),
               //ConstrainedBox(constraints: contentConstraints),//SizedBox(),
-              dragAnchor: DragAnchor.child,
+              dragAnchorStrategy: childDragAnchorStrategy,
               onDragStarted: onDragStarted,
               // When the drag ends inside a DragTarget widget, the drag
               // succeeds, and we reorder the widget into position appropriately.
@@ -603,7 +603,7 @@ class _ReorderableFlexContentState extends State<_ReorderableFlexContent>
               childWhenDragging: IgnorePointer(
                   ignoring: true,
                   child: Opacity(opacity: 0, child: Container(width: 0, height: 0, child: toWrap))),
-              dragAnchor: DragAnchor.child,
+              dragAnchorStrategy: childDragAnchorStrategy,
               onDragStarted: onDragStarted,
               // When the drag ends inside a DragTarget widget, the drag
               // succeeds, and we reorder the widget into position appropriately.

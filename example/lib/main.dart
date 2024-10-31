@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
+  MyHomePage({Key? key, required this.title}) : super(key: key);
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -67,31 +67,31 @@ class _MyHomePageState extends State<MyHomePage> {
         items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.grid_on, color: _bottomNavigationColor),
-            title: Text('ReroderableTable', maxLines: 2, style: TextStyle(color: _bottomNavigationColor)),
+            label: 'ReroderableTable',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.apps, color: _bottomNavigationColor),
-            title: Text('ReroderableWrap', maxLines: 2, style: TextStyle(color: _bottomNavigationColor)),
+            label: 'ReroderableWrap',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.view_quilt, color: _bottomNavigationColor),
-            title: Text('Nested ReroderableWrap', maxLines: 3, style: TextStyle(color: _bottomNavigationColor)),
+            label: 'Nested ReroderableWrap',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.more_vert, color: _bottomNavigationColor),
-            title: Text('ReroderableColumn 1', maxLines: 2, style: TextStyle(color: _bottomNavigationColor))
+            label: 'ReroderableColumn 1'
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.more_vert, color: _bottomNavigationColor),
-            title: Text('ReroderableColumn 2', maxLines: 2, style: TextStyle(color: _bottomNavigationColor))
+            label: 'ReroderableColumn 2'
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.more_horiz, color: _bottomNavigationColor),
-            title: Text('ReroderableRow', maxLines: 2, style: TextStyle(color: _bottomNavigationColor))
+            label: 'ReroderableRow'
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.calendar_view_day, color: _bottomNavigationColor),
-            title: Text('ReroderableSliverList', maxLines: 2, style: TextStyle(color: _bottomNavigationColor))
+            label: 'ReroderableSliverList'
           ),
         ],
         onTap: (int index) {
