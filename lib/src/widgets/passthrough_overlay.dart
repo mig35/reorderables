@@ -501,7 +501,7 @@ class _TheatreElement extends RenderObjectElement {
     super.update(newWidget);
     assert(widget == newWidget);
     _onstage = updateChild(_onstage, widget.onstage, _onstageSlot);
-    _offstage = updateChildren(_offstage as List<Element>, widget.offstage, forgottenChildren: _forgottenOffstageChildren);
+    _offstage = updateChildren(_offstage.map((item) => item!).toList(), widget.offstage, forgottenChildren: _forgottenOffstageChildren);
     _forgottenOffstageChildren.clear();
   }
 }
