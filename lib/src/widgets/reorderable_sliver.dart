@@ -366,10 +366,10 @@ class _ReorderableSliverListState extends State<ReorderableSliverList>
       _attachedScrollPosition = null;
     }
 
-    _scrollController = PrimaryScrollController.of(context) ?? ScrollController();
+    _scrollController = PrimaryScrollController.maybeOf(context) ?? ScrollController();
 
     if (_scrollController!.positions.isEmpty) {
-      ScrollableState? scrollableState = Scrollable.of(context);
+      ScrollableState? scrollableState = Scrollable.maybeOf(context);
       _attachedScrollPosition = scrollableState?.position;
     } else {
       _attachedScrollPosition = null;
